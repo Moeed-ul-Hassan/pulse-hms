@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(NURSE)
+  password  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  appointments    Appointment[]
+  auditLogs      AuditLog[]
+  createdPatients Patient[]     @relation("CreatedBy")
+  updatedPatients Patient[]     @relation("UpdatedBy")
+
+  @@map("users")
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  name        String
+  age         Int
+  gender      Gender
+  phone       String?
+  email       String?
+  address     String?
+  emergencyContact String?
+  medicalHistory String?
+  attachments String? // JSON array of file paths
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById String
+  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedById String?
+  appointments Appointment[]
+  bills       Bill[]
+  auditLogs   AuditLog[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  patientId   String
+  doctorId    String
+  scheduledAt DateTime
+  duration    Int      @default(30) // minutes
+  status      AppointmentStatus @default(SCHEDULED)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  doctor      User     @relation(fields: [doctorId], references: [id])
+  bills       Bill[]
+  auditLogs   AuditLog[]
+
+  @@map("appointments")
+}
+
+model Bill {
+  id          String   @id @default(cuid())
+  patientId   String
+  appointmentId String?
+  amount      Float
+  description String
+  status      PaymentStatus @default(UNPAID)
+  paidAmount  Float    @default(0)
+  paidAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  auditLogs   AuditLog[]
+
+  @@map("bills")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  patientId String?
+  appointmentId String?
+  billId    String?
+  action    String   // CREATE, UPDATE, DELETE, LOGIN, etc.
+  details   String?  // JSON string with additional details
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id])
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  bill      Bill?    @relation(fields: [billId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  NURSE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+}
