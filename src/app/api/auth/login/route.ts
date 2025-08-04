@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       role: user.role
     })
 
-    setAuthCookie(token)
+    await setAuthCookie(token)
 
     // Create audit log
     await prisma.auditLog.create({
