@@ -7,7 +7,7 @@ import { useReactToPrint } from 'react-to-print'
 import dynamic from 'next/dynamic'
 
 // Dynamically import html2pdf to avoid SSR issues
-const html2pdf = dynamic(() => import('html2pdf.js'), { ssr: false })
+const html2pdf = dynamic(() => import('html2pdf.js').then(module => ({ default: module.default })), { ssr: false })
 import { 
   Printer, 
   Download, 
