@@ -18,5 +18,23 @@ export {
   ShareButton
 } from './AnimatedButton'
 
+// Role-based Access Control Components
+export { 
+  default as RoleGuard,
+  AdminOnly,
+  DoctorOnly,
+  NurseOnly,
+  AdminOrDoctor,
+  AdminOrNurse,
+  CanManageUsers,
+  CanCreatePatients,
+  CanDeletePatients,
+  CanCreateAppointments,
+  CanDeleteAppointments,
+  CanManageBills,
+  CanExportReports,
+  CanAccessSettings
+} from './RoleGuard'
+
 // Re-export existing components
 export * from './printables' 

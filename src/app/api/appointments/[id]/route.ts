@@ -59,8 +59,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const user = await getCurrentUser()
     
@@ -76,7 +77,7 @@ export async function PUT(
 
     // Check if appointment exists
     const existingAppointment = await prisma.appointment.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existingAppointment) {
@@ -90,7 +91,7 @@ export async function PUT(
     const conflictingAppointment = await prisma.appointment.findFirst({
       where: {
         doctorId,
-        id: { not: params.id },
+        id: { not: id },
         scheduledAt: {
           gte: new Date(scheduledAt),
           lt: new Date(new Date(scheduledAt).getTime() + (duration || 30) * 60000)
@@ -159,8 +160,9 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const user = await getCurrentUser()
     
@@ -226,8 +228,9 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const user = await getCurrentUser()
     

@@ -17,9 +17,13 @@ import {
   FileText,
   Heart,
   Shield,
-  Receipt
+  Receipt,
+  UserCheck,
+  Stethoscope,
+  ClipboardList
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { getNavigationItems, canAccessRoute } from '@/lib/permissions'
 
 interface User {
   id: string
@@ -70,64 +74,89 @@ export default function DashboardLayout({
     }
   }
 
-  const navigation = useMemo(() => [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: Activity,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    },
-    { 
-      name: 'Patients', 
-      href: '/dashboard/patients', 
-      icon: Users,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    { 
-      name: 'Appointments', 
-      href: '/dashboard/appointments', 
-      icon: Calendar,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
-    },
-    { 
-      name: 'Billing', 
-      href: '/dashboard/billing', 
-      icon: DollarSign,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    },
-    { 
-      name: 'Printables', 
-      href: '/dashboard/printables', 
-      icon: FileText,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50'
-    },
-    { 
-      name: 'New Receipt', 
-      href: '/dashboard/new-receipt', 
-      icon: Receipt,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50'
-    },
-    { 
-      name: 'Reports', 
-      href: '/dashboard/reports', 
-      icon: BarChart3,
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-50'
-    },
-    ...(user?.role === 'ADMIN' ? [{ 
-      name: 'Settings', 
-      href: '/dashboard/settings', 
-      icon: Settings,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50'
-    }] : [])
-  ], [user?.role])
+  const navigation = useMemo(() => {
+    const allNavigationItems = [
+      { 
+        name: 'Dashboard', 
+        href: '/dashboard', 
+        icon: Activity,
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'Patients', 
+        href: '/dashboard/patients', 
+        icon: Users,
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'Appointments', 
+        href: '/dashboard/appointments', 
+        icon: Calendar,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'Billing', 
+        href: '/dashboard/billing', 
+        icon: DollarSign,
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'Printables', 
+        href: '/dashboard/printables', 
+        icon: FileText,
+        color: 'text-indigo-600',
+        bgColor: 'bg-indigo-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'New Receipt', 
+        href: '/dashboard/new-receipt', 
+        icon: Receipt,
+        color: 'text-emerald-600',
+        bgColor: 'bg-emerald-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
+      },
+      { 
+        name: 'Reports', 
+        href: '/dashboard/reports', 
+        icon: BarChart3,
+        color: 'text-pink-600',
+        bgColor: 'bg-pink-50',
+        roles: ['ADMIN', 'DOCTOR']
+      },
+      { 
+        name: 'User Management', 
+        href: '/dashboard/users', 
+        icon: UserCheck,
+        color: 'text-red-600',
+        bgColor: 'bg-red-50',
+        roles: ['ADMIN']
+      },
+      { 
+        name: 'Settings', 
+        href: '/dashboard/settings', 
+        icon: Settings,
+        color: 'text-gray-600',
+        bgColor: 'bg-gray-50',
+        roles: ['ADMIN']
+      }
+    ]
+
+    // Filter navigation based on user role
+    if (!user?.role) return []
+    
+    return allNavigationItems.filter(item => 
+      item.roles.includes(user.role as any)
+    )
+  }, [user?.role])
 
   if (isLoading) {
     return (

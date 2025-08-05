@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
 import { PrimaryButton, AddButton, EditButton, DeleteButton, ViewButton, LoadingSpinner } from '@/components'
+import { CanCreatePatients, CanDeletePatients } from '@/components/RoleGuard'
 
 interface Patient {
   id: string
@@ -44,6 +45,7 @@ export default function PatientsPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   const {
     register,
@@ -57,7 +59,20 @@ export default function PatientsPage() {
 
   useEffect(() => {
     fetchPatients()
+    fetchUser()
   }, [])
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me')
+      if (response.ok) {
+        const userData = await response.json()
+        setUser(userData.user)
+      }
+    } catch (error) {
+      console.error('Failed to get user:', error)
+    }
+  }
 
   const fetchPatients = async () => {
     try {
@@ -163,13 +178,15 @@ export default function PatientsPage() {
           </h1>
           <p className="text-gray-600 mt-2">Manage patient records and information</p>
         </div>
-        <AddButton 
-          size="lg" 
-          onClick={() => setShowAddForm(true)}
-          className="animate-fade-in"
-        >
-          Add Patient
-        </AddButton>
+        <CanCreatePatients userRole={user?.role as any}>
+          <AddButton 
+            size="lg" 
+            onClick={() => setShowAddForm(true)}
+            className="animate-fade-in"
+          >
+            Add Patient
+          </AddButton>
+        </CanCreatePatients>
       </div>
 
       {/* Stats Cards */}
@@ -470,18 +487,22 @@ export default function PatientsPage() {
                   
                   <div className="flex items-center space-x-2">
                     <ViewButton size="sm">View</ViewButton>
-                    <EditButton 
-                      size="sm" 
-                      onClick={() => handleEdit(patient)}
-                    >
-                      Edit
-                    </EditButton>
-                    <DeleteButton 
-                      size="sm" 
-                      onClick={() => handleDelete(patient.id)}
-                    >
-                      Delete
-                    </DeleteButton>
+                    <CanCreatePatients userRole={user?.role as any}>
+                      <EditButton 
+                        size="sm" 
+                        onClick={() => handleEdit(patient)}
+                      >
+                        Edit
+                      </EditButton>
+                    </CanCreatePatients>
+                    <CanDeletePatients userRole={user?.role as any}>
+                      <DeleteButton 
+                        size="sm" 
+                        onClick={() => handleDelete(patient.id)}
+                      >
+                        Delete
+                      </DeleteButton>
+                    </CanDeletePatients>
                   </div>
                 </div>
                 

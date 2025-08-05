@@ -19,7 +19,7 @@ import {
   CalendarDays
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { PrimaryButton, LoadingSpinner } from '@/components'
+import { PrimaryButton, LoadingSpinner, CanCreateAppointments, CanDeleteAppointments } from '@/components'
 
 interface Appointment {
   id: string
@@ -71,6 +71,7 @@ export default function AppointmentsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedDate, setSelectedDate] = useState(new Date())
+  const [user, setUser] = useState<any>(null)
 
   const {
     register,
@@ -85,7 +86,20 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     fetchData()
+    fetchUser()
   }, [])
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me')
+      if (response.ok) {
+        const userData = await response.json()
+        setUser(userData.user)
+      }
+    } catch (error) {
+      console.error('Failed to get user:', error)
+    }
+  }
 
   const fetchData = async () => {
     try {
