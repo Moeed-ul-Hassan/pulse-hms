@@ -1,13 +1,7 @@
 'use client'
 
-'use client'
-
 import { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
-import dynamic from 'next/dynamic'
-
-// Dynamically import html2pdf to avoid SSR issues
-const html2pdf = dynamic(() => import('html2pdf.js').then(module => ({ default: module.default })), { ssr: false })
 import { 
   Printer, 
   Download, 
@@ -83,6 +77,10 @@ const PrintManager = ({
     toast.loading('Generating PDF...')
 
     try {
+      // Dynamically import html2pdf only when needed
+      const html2pdfModule = await import('html2pdf.js')
+      const html2pdf = html2pdfModule.default
+
       const element = printRef.current
       const opt = {
         margin: [10, 10, 10, 10],

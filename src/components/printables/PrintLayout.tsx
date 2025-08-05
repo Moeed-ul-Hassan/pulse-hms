@@ -1,7 +1,6 @@
 'use client'
 
-import { forwardRef } from 'react'
-import QRCode from 'qrcode'
+import { forwardRef, useEffect, useState } from 'react'
 
 interface PrintLayoutProps {
   children: React.ReactNode
