@@ -4,11 +4,10 @@ import { getCurrentUser } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await getCurrentUser()
-    const { id } = await params
     
     if (!user) {
       return NextResponse.json(
@@ -18,18 +17,28 @@ export async function GET(
     }
 
     const patient = await prisma.patient.findUnique({
-      where: { id, isActive: true },
-      include: {
+      where: { id: params.id },
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        gender: true,
+        phone: true,
+        email: true,
+        address: true,
+        emergencyContact: true,
+        medicalHistory: true,
+        createdAt: true,
+        updatedAt: true,
         createdBy: {
-          select: { name: true }
+          select: {
+            name: true
+          }
         },
-        appointments: {
-          orderBy: { scheduledAt: 'desc' },
-          take: 5
-        },
-        bills: {
-          orderBy: { createdAt: 'desc' },
-          take: 5
+        updatedBy: {
+          select: {
+            name: true
+          }
         }
       }
     })
@@ -53,11 +62,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await getCurrentUser()
-    const { id } = await params
     
     if (!user) {
       return NextResponse.json(
@@ -69,8 +77,27 @@ export async function PUT(
     const body = await request.json()
     const { name, age, gender, phone, email, address, emergencyContact, medicalHistory } = body
 
+    if (!name || !age || !gender) {
+      return NextResponse.json(
+        { error: 'Name, age, and gender are required' },
+        { status: 400 }
+      )
+    }
+
+    // Check if patient exists
+    const existingPatient = await prisma.patient.findUnique({
+      where: { id: params.id }
+    })
+
+    if (!existingPatient) {
+      return NextResponse.json(
+        { error: 'Patient not found' },
+        { status: 404 }
+      )
+    }
+
     const patient = await prisma.patient.update({
-      where: { id },
+      where: { id: params.id },
       data: {
         name,
         age: parseInt(age),
@@ -107,11 +134,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await getCurrentUser()
-    const { id } = await params
     
     if (!user) {
       return NextResponse.json(
@@ -120,10 +146,25 @@ export async function DELETE(
       )
     }
 
-    // Soft delete - mark as inactive
+    // Check if patient exists
+    const existingPatient = await prisma.patient.findUnique({
+      where: { id: params.id }
+    })
+
+    if (!existingPatient) {
+      return NextResponse.json(
+        { error: 'Patient not found' },
+        { status: 404 }
+      )
+    }
+
+    // Soft delete - set isActive to false
     const patient = await prisma.patient.update({
-      where: { id },
-      data: { isActive: false }
+      where: { id: params.id },
+      data: {
+        isActive: false,
+        updatedById: user.id
+      }
     })
 
     // Create audit log
