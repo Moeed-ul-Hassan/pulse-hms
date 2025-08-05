@@ -29,6 +29,27 @@ const PrintLayout = forwardRef<HTMLDivElement, PrintLayoutProps>(({
   qrCodeData,
   className = ''
 }, ref) => {
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (showQRCode && qrCodeData) {
+      // Dynamically import and generate QR code
+      import('qrcode').then((QRCode) => {
+        QRCode.toDataURL(qrCodeData, {
+          width: 80,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        }).then((url) => {
+          setQrCodeUrl(url)
+        }).catch((err) => {
+          console.error('QR Code generation failed:', err)
+        })
+      })
+    }
+  }, [showQRCode, qrCodeData])
   return (
     <div 
       ref={ref}
@@ -114,13 +135,14 @@ const PrintLayout = forwardRef<HTMLDivElement, PrintLayoutProps>(({
             </div>
           </div>
           
-          {showQRCode && qrCodeData && (
+          {showQRCode && qrCodeUrl && (
             <div className="text-right">
-              <QRCode 
-                value={qrCodeData}
-                size={80}
-                level="M"
+              <img 
+                src={qrCodeUrl}
+                alt="QR Code"
                 className="border border-gray-300"
+                width={80}
+                height={80}
               />
               <p className="text-xs text-gray-500 mt-1">Scan for digital copy</p>
             </div>

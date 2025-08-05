@@ -70,72 +70,64 @@ export default function DashboardLayout({
     }
   }
 
-  const navigation = [
+  const navigation = useMemo(() => [
     { 
       name: 'Dashboard', 
       href: '/dashboard', 
       icon: Activity,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      gradient: 'gradient-blue'
+      bgColor: 'bg-blue-50'
     },
     { 
       name: 'Patients', 
       href: '/dashboard/patients', 
       icon: Users,
       color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      gradient: 'gradient-green'
+      bgColor: 'bg-green-50'
     },
     { 
       name: 'Appointments', 
       href: '/dashboard/appointments', 
       icon: Calendar,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      gradient: 'gradient-purple'
+      bgColor: 'bg-purple-50'
     },
     { 
       name: 'Billing', 
       href: '/dashboard/billing', 
       icon: DollarSign,
       color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      gradient: 'gradient-orange'
+      bgColor: 'bg-orange-50'
     },
     { 
       name: 'Printables', 
       href: '/dashboard/printables', 
       icon: FileText,
       color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      gradient: 'gradient-blue'
+      bgColor: 'bg-indigo-50'
     },
     { 
       name: 'New Receipt', 
       href: '/dashboard/new-receipt', 
       icon: Receipt,
       color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
-      gradient: 'gradient-green'
+      bgColor: 'bg-emerald-50'
     },
     { 
       name: 'Reports', 
       href: '/dashboard/reports', 
       icon: BarChart3,
       color: 'text-pink-600',
-      bgColor: 'bg-pink-50',
-      gradient: 'gradient-purple'
+      bgColor: 'bg-pink-50'
     },
     ...(user?.role === 'ADMIN' ? [{ 
       name: 'Settings', 
       href: '/dashboard/settings', 
       icon: Settings,
       color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      gradient: 'gradient-blue'
+      bgColor: 'bg-gray-50'
     }] : [])
-  ]
+  ], [user?.role])
 
   if (isLoading) {
     return (
