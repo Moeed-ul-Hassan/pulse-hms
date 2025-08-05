@@ -148,6 +148,14 @@ export default function DashboardLayout({
         color: 'text-gray-600',
         bgColor: 'bg-gray-50',
         roles: ['ADMIN']
+      },
+      { 
+        name: 'About Team', 
+        href: '/dashboard/about-team', 
+        icon: Users,
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        roles: ['ADMIN', 'DOCTOR', 'NURSE']
       }
     ]
 

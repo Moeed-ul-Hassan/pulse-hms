@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import Watermark from "@/components/Watermark";
 
 export const metadata: Metadata = {
   title: "Pulse HMS - Hospital Management System",
@@ -19,33 +20,34 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased font-sans">
-        {children}
-        <Toaster 
-          position="top-right" 
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
+              <body className="antialiased font-sans">
+          {children}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
               },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
-      </body>
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <Watermark />
+        </body>
     </html>
   );
 }

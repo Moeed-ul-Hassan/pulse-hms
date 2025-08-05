@@ -36,5 +36,8 @@ export {
   CanAccessSettings
 } from './RoleGuard'
 
+// Watermark Component
+export { default as Watermark } from './Watermark'
+
 // Re-export existing components
 export * from './printables' 
