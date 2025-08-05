@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getNavigationItems, canAccessRoute } from '@/lib/permissions'
+import Watermark from '@/components/Watermark'
 
 interface User {
   id: string
@@ -170,10 +171,11 @@ export default function DashboardLayout({
           <div className="mt-6 flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
-        </div>
-      </div>
-    )
-  }
+              </div>
+      <Watermark />
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -318,6 +320,7 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+      <Watermark />
     </div>
   )
 } 
